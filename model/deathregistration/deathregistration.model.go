@@ -1,7 +1,5 @@
 package deathregistration
 
-import "fmt"
-
-func SetDeathRegistrationModel() {
-	fmt.Println("SetDeathRegistrationModel")
+func SetDeathRegistration() {
+	fmt.Println("SetDeathRegistration")
 }

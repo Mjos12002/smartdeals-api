@@ -1,7 +1,5 @@
 package birthregistration
 
-import "fmt"
-
-func SetBirthRegistrationModel() {
-	fmt.Println("SetBirthRegistrationModel")
+func SetBirthRegistration() {
+	fmt.Println("SetBirthRegistration")
 }
