@@ -1,0 +1,7 @@
+package dto
+
+// AuthDto represents the data transfer object for authentication operations
+type AuthDTO struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required,min=6"`
+}
