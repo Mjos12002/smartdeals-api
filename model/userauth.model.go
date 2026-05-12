@@ -3,7 +3,7 @@ package model
 import "gorm.io/gorm"
 
 // UserAuth represents the user details model in the database
-type UserAuth struct {
+type UserAuthModel struct {
 	gorm.Model
 	Username    string           `json:"username" binding:"required"`
 	Password    string           `json:"u_password" binding:"required,min=6"`

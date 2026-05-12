@@ -1,10 +1,11 @@
 -- +goose Up
-CREATE TABLE userroles (
-    userole_id SERIAL PRIMARY KEY,
+CREATE TABLE user_roles (
+    id SERIAL PRIMARY KEY,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    userauth_id INT REFERENCES userauths(userauthid) ON DELETE CASCADE,
-    roles_id INT REFERENCES roles(roles_id) ON DELETE CASCADE
+    deleted_at TIMESTAMP DEFAULT NOW(),
+    user_auth_id INT REFERENCES user_auths(id) ON DELETE CASCADE,
+    role_id INT REFERENCES roles(id) ON DELETE CASCADE
 );
 
 -- +goose Down

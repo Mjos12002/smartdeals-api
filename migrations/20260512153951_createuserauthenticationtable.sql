@@ -1,10 +1,11 @@
 -- +goose Up
-CREATE TABLE userauthentications (
-    userauthenticationid SERIAL PRIMARY KEY,
-    authentication_status TEXT,
+CREATE TABLE user_authentications (
+    id SERIAL PRIMARY KEY,
+    status TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    userauthid INT REFERENCES userauths(userauthid) ON DELETE CASCADE
+    deleted_at TIMESTAMP DEFAULT NOW(),
+    user_authid INT REFERENCES user_auths(id) ON DELETE CASCADE
 );
 
 -- +goose Down

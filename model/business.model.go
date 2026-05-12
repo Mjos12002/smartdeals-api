@@ -3,7 +3,7 @@ package model
 import "gorm.io/gorm"
 
 // Business represents the business details model in the database
-type Business struct {
+type BusinessModel struct {
 	gorm.Model
 	Name          string `json:"b_name" binding:"required"`
 	Description   string `json:"b_description" binding:"required"`

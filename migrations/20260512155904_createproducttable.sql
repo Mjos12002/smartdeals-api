@@ -13,6 +13,7 @@ CREATE TABLE products (
     image_url TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP DEFAULT NOW(),
     business_id INT REFERENCES businesses(id) ON DELETE CASCADE
 );
 

@@ -1,13 +1,13 @@
 -- +goose Up
-CREATE TABLE userdetails (
+CREATE TABLE user_details (
     id SERIAL PRIMARY KEY,
     email TEXT,
     phone TEXT,
-    u_address TEXT,
-    fname TEXT,
-    lname TEXT,
+    first_name TEXT,
+    last_name TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP DEFAULT NOW()
 );
 
 -- +goose Down
