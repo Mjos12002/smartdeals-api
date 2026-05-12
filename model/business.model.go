@@ -1,8 +1,10 @@
 package model
 
+import "gorm.io/gorm"
+
 // Business represents the business details model in the database
 type Business struct {
-	ID            int    `json:"id"`
+	gorm.Model
 	Name          string `json:"b_name" binding:"required"`
 	Description   string `json:"b_description" binding:"required"`
 	Phone         string `json:"b_contact" binding:"required"`

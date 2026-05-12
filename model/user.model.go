@@ -1,7 +1,10 @@
 package model
 
+import "gorm.io/gorm"
+
 // User represents the user model in the database
 type UserModel struct {
+	gorm.Model
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required,min=6"`
 	Email    string `json:"email" binding:"required,email"`

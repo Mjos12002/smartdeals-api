@@ -1,8 +1,10 @@
 package model
 
+import "gorm.io/gorm"
+
 // Address represents the address model in the database
 type Address struct {
-	ID          int    `json:"id"`
+	gorm.Model
 	Street      string `json:"street"`
 	PopularName string `json:"popularname"`
 	Province    string `json:"province"`

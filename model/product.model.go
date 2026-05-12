@@ -1,8 +1,10 @@
 package model
 
+import "gorm.io/gorm"
+
 // Product represents the product model in the database
 type Product struct {
-	ID                int      `json:"id"`
+	gorm.Model
 	Name              string   `json:"product_name"`
 	Description       string   `json:"product_description"`
 	Price             float64  `json:"price"`
