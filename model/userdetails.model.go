@@ -3,11 +3,10 @@ package model
 import "gorm.io/gorm"
 
 // UserDetails represents the user details model in the database
-type UserDetailsModel struct {
+type UserDetails struct {
 	gorm.Model
-	Email   string    `json:"email" binding:"required,email"`
-	Phone   string    `json:"phone" binding:"required"`
-	Address Addresses `json:"u_address" binding:"required"`
-	FName   string    `json:"fname" binding:"required"`
-	LName   string    `json:"lname" binding:"required"`
+	Email     string `json:"email" binding:"required" validate:"required,email,min=5,max=50"`
+	Phone     string `json:"phone" binding:"required" validate:"required,min=10,max=15"`
+	FirstName string `json:"first_name" binding:"required" validate:"required,min=5,max=30"`
+	LastName  string `json:"last_name" binding:"required" validate:"required,min=5,max=30"`
 }

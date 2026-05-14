@@ -11,4 +11,4 @@ CREATE TABLE user_details (
 );
 
 -- +goose Down
-DROP TABLE userdetails;
+DROP TABLE user_details;
