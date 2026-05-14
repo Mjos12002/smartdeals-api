@@ -30,10 +30,20 @@ func DBInitialize() *gorm.DB {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", dbHost, dbUser, dbPass, dbName, dbPort)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
+		PrepareStmt:            false,
 	})
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Failed to connect to database: %s", err))
 	}
 	return db
 
+}
+
+type DBInit struct {
+	DB *gorm.DB
+}
+
+func NewDBInit() *DBInit {
+	db := DBInitialize()
+	return &DBInit{DB: db}
 }
