@@ -29,7 +29,7 @@ func (s *AddressService) CreateAddress(address *model.Addresses) (int, error) {
 }
 
 // GetAllAddresses retrieves all addresses from the database
-func (s *AddressService) GetAllAddresses() (response.GetAddressResponse, error) {
+func (s *AddressService) GetAllAddresses() (response.AddressResponse, error) {
 	// Implement logic to fetch all addresses from the database
 	// Return the list of addresses and any error encountered
 
@@ -47,7 +47,7 @@ func (s *AddressService) GetAllAddresses() (response.GetAddressResponse, error) 
 		errMsg = result.Error.Error()
 	}
 
-	return response.GetAddressResponse{
+	return response.AddressResponse{
 		Status:  status,
 		Code:    code,
 		Message: message,

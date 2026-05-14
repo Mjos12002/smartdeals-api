@@ -3,12 +3,13 @@ package model
 import "gorm.io/gorm"
 
 // Business represents the business details model in the database
-type BusinessModel struct {
+type Businesses struct {
 	gorm.Model
-	Name        string      `json:"b_name" binding:"required"`
-	Description string      `json:"b_description" binding:"required"`
-	Phone       string      `json:"b_contact" binding:"required"`
-	LogoURL     string      `json:"logo_url" binding:"required"`
-	Address     Addresses   `json:"address_id" binding:"required"`
-	UserDetails UserDetails `json:"address" binding:"required"`
+	Name          string `json:"name" binding:"required" validate:"required,min=3,max=100"`
+	Description   string `json:"description" binding:"required" validate:"required,min=10,max=500"`
+	Contact       string `json:"contact" binding:"required" validate:"required,min=10,max=15"`
+	Phone         string `json:"phone" binding:"required" validate:"required,min=10,max=15"`
+	LogoURL       string `json:"logo_url" binding:"required"`
+	AddressID     int    `json:"address_id" binding:"required" validate:"required"`
+	UserDetailsID int    `json:"user_details_id" binding:"required" validate:"required"`
 }

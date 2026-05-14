@@ -16,7 +16,7 @@ func CreateUser(c *gin.Context) {
 
 	// Bind the JSON request body to the userDetails struct and handle any binding errors
 	if err := c.ShouldBindJSON(&userDetails); err != nil {
-		c.JSON(400, response.CreateResponse{
+		c.JSON(400, response.GenericCreateResponse{
 			Status:   "error",
 			Code:     400,
 			Message:  "Invalid request body",
@@ -44,7 +44,7 @@ func CreateUser(c *gin.Context) {
 	}
 	recordID = userID
 
-	c.JSON(code, response.CreateResponse{
+	c.JSON(code, response.GenericCreateResponse{
 		Status:   status,
 		Code:     code,
 		Message:  message,

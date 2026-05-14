@@ -16,7 +16,7 @@ func CreateAddress(c *gin.Context) {
 
 	// Bind the JSON request body to the address struct and handle any binding errors
 	if err := c.ShouldBindJSON(&address); err != nil {
-		c.JSON(400, response.CreateResponse{
+		c.JSON(400, response.GenericCreateResponse{
 			Status:   "error",
 			Code:     400,
 			Message:  "Invalid request body",
@@ -44,7 +44,7 @@ func CreateAddress(c *gin.Context) {
 	}
 	recordID = addressID
 
-	c.JSON(code, response.CreateResponse{
+	c.JSON(code, response.GenericCreateResponse{
 		Status:   status,
 		Code:     code,
 		Message:  message,
@@ -59,12 +59,12 @@ func GetAllAddresses(c *gin.Context) {
 	addressResponse, err := addressService.GetAllAddresses()
 
 	if err != nil {
-		c.JSON(500, response.GetAddressResponse{
-			Status:  "error",
-			Code:    500,
-			Message: "Failed to retrieve addresses",
-			Err:     err.Error(),
-			Data:    nil,
+		c.JSON(500, response.GenericCreateResponse{
+			Status:   "error",
+			Code:     500,
+			Message:  "Failed to retrieve addresses",
+			Err:      err.Error(),
+			RecordID: 0,
 		})
 		return
 	}

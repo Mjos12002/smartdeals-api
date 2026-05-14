@@ -18,7 +18,7 @@ func CreateRole(c *gin.Context) {
 	// Bind the JSON request body to the roles struct and handle any binding errors
 	if err := c.ShouldBindJSON(&roles); err != nil {
 
-		c.JSON(400, response.CreateResponse{
+		c.JSON(400, response.GenericCreateResponse{
 			Status:   "error",
 			Code:     400,
 			Message:  "Invalid request body",
@@ -46,7 +46,7 @@ func CreateRole(c *gin.Context) {
 	}
 	recordID = int(role)
 
-	c.JSON(code, response.CreateResponse{
+	c.JSON(code, response.GenericCreateResponse{
 		Status:   status,
 		Code:     code,
 		Message:  message,

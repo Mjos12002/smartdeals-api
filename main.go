@@ -34,6 +34,12 @@ func main() {
 	// Route to get all addresses
 	r.GET("/api/address", restcontroller.GetAllAddresses) // Get all addresses
 
+	// Route to create a new business
+	r.POST("/api/business", restcontroller.CreateBusiness) // Create a new business
+
+	// Route to get all businesses
+	r.GET("/api/business", restcontroller.GetAllBusinesses) // Get all businesses
+
 	// Start the server
 	r.Run(":8090") // Run on port 8090
 }
