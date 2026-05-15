@@ -46,6 +46,12 @@ func main() {
 	// Route to get all products
 	r.GET("/api/v1/product", restcontroller.GetAllProducts) // Get all products``
 
-	// Start the server
+	// Route to create a new product category
+	r.POST("/api/v1/product-category", restcontroller.CreateProductCategory)
+
+	// Route to get all product categories
+	r.GET("/api/v1/product-category", restcontroller.GetAllProductCategories)
+
+	// Start the server on a specific port
 	r.Run(":8090") // Run on port 8090
 }
