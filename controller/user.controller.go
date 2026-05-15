@@ -4,6 +4,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
 	"smartdeals.rw/response"
 	"smartdeals.rw/service"
@@ -12,7 +13,7 @@ import (
 
 // CreateUser is a handler function to create a new user
 func CreateUser(c *gin.Context) {
-	var userDetails model.UserDetails
+	var userDetails dto.UserDetailsDTO
 
 	// Bind the JSON request body to the userDetails struct and handle any binding errors
 	if err := c.ShouldBindJSON(&userDetails); err != nil {
@@ -29,7 +30,14 @@ func CreateUser(c *gin.Context) {
 	// Create a new instance of UserService and call the CreateUser method to create the user
 	userService := service.NewUserService(utils.DBInitialize())
 
-	userID, err := userService.CreateUser(&userDetails)
+	userDetailsModel := model.UserDetails{
+		FirstName: userDetails.FirstName,
+		LastName:  userDetails.LastName,
+		Email:     userDetails.Email,
+		Phone:     userDetails.Phone,
+	}
+
+	userID, err := userService.CreateUser(&userDetailsModel)
 	status := "success"
 	code := 200
 	message := "User created successfully"

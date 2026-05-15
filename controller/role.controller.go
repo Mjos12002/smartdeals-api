@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
 	"smartdeals.rw/response"
 	"smartdeals.rw/service"
@@ -13,7 +14,7 @@ import (
 func CreateRole(c *gin.Context) {
 	// Implement logic to create a new role using the RoleService
 	// You can extract the role name from the request body and call the service method to create the role
-	var roles model.Roles
+	var roles dto.RoleDTO
 
 	// Bind the JSON request body to the roles struct and handle any binding errors
 	if err := c.ShouldBindJSON(&roles); err != nil {
@@ -31,7 +32,11 @@ func CreateRole(c *gin.Context) {
 	// Create a new instance of RoleService and call the CreateRole method to create the role
 	roleService := service.NewRoleService(utils.DBInitialize())
 
-	role, err := roleService.CreateRole(&roles)
+	// Generate the role model from the DTO and call the CreateRole method to create the role in the database
+	roleModel := model.Roles{
+		RoleName: roles.Name,
+	}
+	role, err := roleService.CreateRole(&roleModel)
 	status := "success"
 	code := 200
 	message := "Role created successfully"

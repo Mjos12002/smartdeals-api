@@ -4,6 +4,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
 	"smartdeals.rw/response"
 	"smartdeals.rw/service"
@@ -12,7 +13,7 @@ import (
 
 // CreateAddress is a handler function to create a new address
 func CreateAddress(c *gin.Context) {
-	var address model.Addresses
+	var address dto.AddressDTO
 
 	// Bind the JSON request body to the address struct and handle any binding errors
 	if err := c.ShouldBindJSON(&address); err != nil {
@@ -29,7 +30,16 @@ func CreateAddress(c *gin.Context) {
 	// Create a new instance of AddressService and call the CreateAddress method to create the address
 	addressService := service.NewAddressService(utils.DBInitialize())
 
-	addressID, err := addressService.CreateAddress(&address)
+	// Generate the address model from the DTO and call the CreateAddress method to create the address in the database
+	addressModel := model.Addresses{
+		Street:      address.Street,
+		PopularName: address.PopularName,
+		Province:    address.Province,
+		District:    address.District,
+		Sector:      address.Sector,
+		LongLat:     address.LongLat,
+	}
+	addressID, err := addressService.CreateAddress(&addressModel)
 	status := "success"
 	code := 200
 	message := "Address created successfully"

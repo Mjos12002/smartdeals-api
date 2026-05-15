@@ -12,6 +12,7 @@ import (
 
 // CreateBusiness is a handler function to create a new business
 func CreateBusiness(c *gin.Context) {
+
 	var business dto.BusinessesDTO
 
 	// Bind the JSON request body to the business struct and handle any binding errors

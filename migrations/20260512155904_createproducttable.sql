@@ -11,10 +11,10 @@ CREATE TABLE products (
     product_status TEXT,
     product_category TEXT,
     image_url TEXT,
+    business_id INT REFERENCES businesses(id) ON DELETE CASCADE
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP DEFAULT NOW(),
-    business_id INT REFERENCES businesses(id) ON DELETE CASCADE
+    deleted_at TIMESTAMP DEFAULT NOW()
 );
 
 -- +goose Down
