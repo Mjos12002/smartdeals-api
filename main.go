@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	restcontroller "smartdeals.rw/controller"
 )
@@ -10,6 +11,7 @@ func main() {
 
 	//dbInit.Create(&role)
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	//Route to get the user by ID
 	r.GET("/api/v1/user/:id", restcontroller.GetUser) // Get a user
