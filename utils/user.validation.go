@@ -7,7 +7,12 @@ import (
 )
 
 // ValidateUserDetails validates the user details data using the validator package
-func ValidateUserDetails(userDetails model.UserDetails) error {
+func ValidateUserDetails(userDetails model.UserProfiles) error {
 	validate := validator.New()
 	return validate.Struct(userDetails)
+}
+
+func ValidateUserAuth(userAuth model.UserAuth) error {
+	validate := validator.New()
+	return validate.Struct(userAuth)
 }

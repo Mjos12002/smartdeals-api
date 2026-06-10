@@ -30,6 +30,12 @@ func main() {
 	// Route to get all users
 	r.GET("/api/v1/user", restcontroller.GetAllUsers) // Get all users
 
+	// Route to handle user sign-up
+	r.POST("/api/v1/signup", restcontroller.SignUp) // User sign-up
+
+	// Route to handle user signin
+	r.POST("/api/v1/signin", restcontroller.SignIn) // User sign-in
+
 	// Route to create a new address
 	r.POST("/api/v1/address", restcontroller.CreateAddress) // Create a new address
 

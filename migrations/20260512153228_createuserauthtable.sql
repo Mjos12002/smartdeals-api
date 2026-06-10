@@ -4,7 +4,7 @@ CREATE TABLE user_auths (
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     status TEXT,
-    user_details_id INT REFERENCES user_details(id) ON DELETE CASCADE,
+    role_id INT REFERENCES roles(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     deleted_at TIMESTAMP DEFAULT NOW()

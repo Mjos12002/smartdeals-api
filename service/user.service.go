@@ -1,6 +1,13 @@
 package service
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	jwtutil "github.com/kittipat1413/go-common/util/jwt"
 	"gorm.io/gorm"
 	"smartdeals.rw/model"
 	"smartdeals.rw/response"
@@ -13,20 +20,28 @@ type UserService struct {
 	db *gorm.DB // Placeholder for the database connection
 }
 
+type MyCustomClaims struct {
+	jwt.RegisteredClaims
+	UserID   string `json:"uid"`
+	Role     string `json:"role"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
+}
+
 // NewUserService creates a new instance of UserService
 func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{db: db}
 }
 
 // GetUserByID fetches a user by their ID
-func (s *UserService) GetUserByID(id uint) (*model.UserDetails, error) {
+func (s *UserService) GetUserByID(id uint) (*model.UserProfiles, error) {
 	// Implement logic to fetch user from the database using the provided ID
 	// Return the user and any error encountered
 	return nil, nil // Placeholder return statement
 }
 
-// CreateUser creates a new user in the database
-func (s *UserService) CreateUser(user *model.UserDetails) (int, error) {
+// CreateProfile creates a new user profile in the database
+func (s *UserService) CreateProfile(user *model.UserProfiles) (int, error) {
 	// Implement logic to create a new user in the database using the provided user details
 	// Return the created user and any error encountered
 	userValidation := utils.ValidateUserDetails(*user)
@@ -41,7 +56,6 @@ func (s *UserService) CreateUser(user *model.UserDetails) (int, error) {
 }
 
 func (s *UserService) GetAllUsers() response.UserResponse {
-	// Implement logic to fetch all users from the database
 	// Return the list of users and any error encountered
 
 	status := "success"
@@ -50,7 +64,7 @@ func (s *UserService) GetAllUsers() response.UserResponse {
 	errMsg := ""
 
 	// Fetch all users from the database
-	users := []model.UserDetails{}
+	users := []model.UserProfiles{}
 	result := s.db.Find(&users)
 
 	if result.Error != nil {
@@ -69,4 +83,67 @@ func (s *UserService) GetAllUsers() response.UserResponse {
 	}
 
 	return userResponses
+}
+
+func (s *UserService) CreateUserAccount(user *model.UserAuth) (int, error) {
+	// Return the created user account and any error encountered
+	userValidation := utils.ValidateUserAuth(*user)
+	if userValidation != nil {
+		return 0, userValidation
+	}
+	userCreated := s.db.Create(&user)
+	if userCreated.Error != nil {
+		return 0, userCreated.Error
+	}
+	return int(user.ID), nil
+}
+
+// SignIn is a method to handle user sign-in using the provided credentials
+func (s *UserService) SignIn(user *model.SignInModel) (*MyCustomClaims, error) {
+	// Return a token or session information and any error encountered
+	authenticatedUser := &response.UserAuths{}
+
+	s.db.Model(&response.UserAuths{}).Preload("Roles").Where("username = ?", user.Username).Where("password = ?", user.Password).First(authenticatedUser)
+	tokenClaims, err := CreateJWT(fmt.Sprintf("%d", authenticatedUser.ID), authenticatedUser.Roles.RoleName, authenticatedUser.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	return tokenClaims, nil
+}
+
+// CrateJWT creates a JWT token for the authenticated user
+func CreateJWT(userID, role, username string) (*MyCustomClaims, error) {
+	ctx := context.Background()
+	signingKey := []byte("7b8ebceb27141aacfbc79027")
+	manager, err := jwtutil.NewJWTManager(jwtutil.HS256, signingKey)
+	if err != nil {
+		log.Fatalf("Failed to create JWTManager: %v", err)
+	}
+
+	claims := &MyCustomClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			Issuer:    "smartdeals.rw",
+			Subject:   "smartdeals-token-creator",
+		},
+		UserID:   userID,
+		Role:     role,
+		Username: username,
+	}
+
+	tokenStringHS256, err := manager.CreateToken(ctx, claims)
+
+	if err != nil {
+		log.Fatalf("Failed to create token: %v", err)
+	}
+
+	parsedClaims := &MyCustomClaims{}
+	err = manager.ParseAndValidateToken(ctx, tokenStringHS256, parsedClaims)
+	if err != nil {
+		log.Fatalf("Failed to validate token: %v", err)
+	}
+	parsedClaims.Token = tokenStringHS256
+
+	return parsedClaims, nil
 }

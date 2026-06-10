@@ -1,12 +1,13 @@
 -- +goose Up
-CREATE TABLE product_category (
+CREATE TABLE user_profiles (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    user_auth_id INTEGER REFERENCES user_auths(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     deleted_at TIMESTAMP DEFAULT NOW()
 );
 
 -- +goose Down
-DROP TABLE product_category;
+DROP TABLE user_profiles;

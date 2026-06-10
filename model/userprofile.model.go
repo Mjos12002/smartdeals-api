@@ -3,7 +3,7 @@ package model
 import "gorm.io/gorm"
 
 // UserDetails represents the user details model in the database
-type UserDetails struct {
+type UserProfiles struct {
 	gorm.Model
 	Email     string `json:"email" binding:"required" validate:"required,email,min=5,max=50"`
 	Phone     string `json:"phone" binding:"required" validate:"required,min=10,max=15"`

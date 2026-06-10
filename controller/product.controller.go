@@ -44,17 +44,17 @@ func CreateProduct(c *gin.Context) {
 
 	// Create a new product model instance from the DTO
 	productModel := model.Products{
-		ProductName:        productDTO.ProductName,
-		ProductDescription: productDTO.ProductDescription,
-		Price:              productDTO.Price,
-		Discount:           productDTO.Discount,
-		DiscountedPrice:    productDTO.DiscountedPrice,
-		DiscountStartDate:  productDTO.DiscountStartDate,
-		DiscountEndDate:    productDTO.DiscountEndDate,
-		ProductStatus:      productDTO.ProductStatus,
-		ProductCategory:    productDTO.ProductCategory,
-		ImageURL:           productDTO.ImageURL,
-		BusinessID:         productDTO.BusinessID,
+		Name:              productDTO.Name,
+		Description:       productDTO.Description,
+		Price:             productDTO.Price,
+		Discount:          productDTO.Discount,
+		DiscountedPrice:   productDTO.DiscountedPrice,
+		DiscountStartDate: productDTO.DiscountStartDate,
+		DiscountEndDate:   productDTO.DiscountEndDate,
+		Status:            productDTO.Status,
+		ProductCategory:   productDTO.ProductCategory,
+		Logo:              productDTO.Logo,
+		BusinessID:        productDTO.BusinessID,
 	}
 
 	// Call the service layer to create the product

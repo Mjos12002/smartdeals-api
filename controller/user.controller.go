@@ -3,6 +3,8 @@ package controller
 // This file contains handler functions related to user operations
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
@@ -13,10 +15,11 @@ import (
 
 // CreateUser is a handler function to create a new user
 func CreateUser(c *gin.Context) {
-	var userDetails dto.UserDetailsDTO
+
+	var userProfile dto.UserProfileDTO
 
 	// Bind the JSON request body to the userDetails struct and handle any binding errors
-	if err := c.ShouldBindJSON(&userDetails); err != nil {
+	if err := c.ShouldBindJSON(&userProfile); err != nil {
 		c.JSON(400, response.GenericCreateResponse{
 			Status:   "error",
 			Code:     400,
@@ -24,20 +27,21 @@ func CreateUser(c *gin.Context) {
 			Err:      err.Error(),
 			RecordID: 0,
 		})
+		fmt.Println(err.Error())
 		return
 	}
 
 	// Create a new instance of UserService and call the CreateUser method to create the user
 	userService := service.NewUserService(utils.DBInitialize())
 
-	userDetailsModel := model.UserDetails{
-		FirstName: userDetails.FirstName,
-		LastName:  userDetails.LastName,
-		Email:     userDetails.Email,
-		Phone:     userDetails.Phone,
+	userProfileModel := model.UserProfiles{
+		FirstName: userProfile.FirstName,
+		LastName:  userProfile.LastName,
+		Email:     userProfile.Email,
+		Phone:     userProfile.Phone,
 	}
 
-	userID, err := userService.CreateUser(&userDetailsModel)
+	userID, err := userService.CreateProfile(&userProfileModel)
 	status := "success"
 	code := 200
 	message := "User created successfully"

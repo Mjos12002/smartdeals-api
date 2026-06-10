@@ -9,4 +9,4 @@ CREATE TABLE user_authentications (
 );
 
 -- +goose Down
-DROP TABLE userauthentications;
+DROP TABLE user_authentications;

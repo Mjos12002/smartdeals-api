@@ -31,8 +31,6 @@ func (s *BusinessService) CreateBusiness(business *dto.BusinessesDTO) (int, erro
 	businessModel := model.Businesses{
 		Name:          business.Name,
 		Description:   business.Description,
-		Contact:       business.Contact,
-		Phone:         business.Phone,
 		LogoURL:       business.LogoURL,
 		AddressID:     business.Address,
 		UserDetailsID: business.UserDetails,
