@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
@@ -77,7 +75,6 @@ func SignUp(c *gin.Context) {
 
 	// User account creation model based on the sign-up data received from the request
 	encryptedPassword, err := utils.EncryptAES(signUpData.Password)
-	fmt.Println("Received Password:", encryptedPassword)
 
 	if err != nil {
 		c.JSON(500, response.GenericCreateResponse{
@@ -93,7 +90,7 @@ func SignUp(c *gin.Context) {
 		Username: signUpData.Username,
 		Password: encryptedPassword,
 		Status:   "active", // Set default status to active
-		RoleID:   2,        // Set default role ID (e.g., 2 for regular users)
+		RolesID:  2,        // Set default role ID (e.g., 2 for regular users)
 	}
 
 	// Call the CreateUserAccount method of the UserService to create a new user account in the database
@@ -163,7 +160,11 @@ func SignIn(c *gin.Context) {
 	code := 200
 	message := "User signed in successfully"
 	errMsg := ""
-	fmt.Println("SignIn Response:", resp.ID)
+	recordID := 0
+	userRole := ""
+	userID := 0
+	token := ""
+	username := ""
 	// Handle the response from the SignIn method and set the appropriate response values based on success or failure
 	if err != nil {
 		code = 401
@@ -172,7 +173,29 @@ func SignIn(c *gin.Context) {
 		errMsg = err.Error()
 	}
 
-	fmt.Printf("SignIn Response: %s \n%s \n%s \n%s\n", resp.Role, resp.Username, resp.UserID, resp.Token)
+	if resp.ID == 0 {
+		code = 404
+		status = "Not Found"
+		message = "User Not found"
+		errMsg = "User Not Found"
+		recordID = 0
+		userRole = ""
+		userID = 0
+		token = ""
+		username = ""
+	}
+
+	if resp.ID > 0 {
+		code = 200
+		status = "Success"
+		message = "User found"
+		errMsg = "User found"
+		recordID = resp.ID
+		userRole = resp.Role
+		userID = resp.ID
+		token = resp.Token
+		username = resp.Username
+	}
 
 	// Send the JSON response back to the client with the appropriate status, code, message, error (if any), and any relevant data (e.g., user details, authentication token, etc.)
 	c.JSON(code, response.GenericCreateResponse{
@@ -180,7 +203,11 @@ func SignIn(c *gin.Context) {
 		Code:     code,
 		Message:  message,
 		Err:      errMsg,
-		RecordID: 0, // You can include any relevant data in the RecordID field or create a new field for it
+		RecordID: recordID,
+		UserRole: userRole,
+		UserID:   userID,
+		Token:    token,
+		Username: username,
 	})
 
 }

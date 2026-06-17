@@ -20,5 +20,5 @@ type UserAuth struct {
 	Username string `json:"username" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
 	Status   string `json:"status" binding:"required"`
-	RoleID   uint   `json:"role_id" binding:"required"`
+	RolesID  uint   `json:"roles_id" binding:"required"`
 }

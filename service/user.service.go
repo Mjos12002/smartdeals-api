@@ -20,12 +20,10 @@ type UserService struct {
 	db *gorm.DB // Placeholder for the database connection
 }
 
+// MyCustomClaims is the structure of the jwt claims
 type MyCustomClaims struct {
 	jwt.RegisteredClaims
-	UserID   string `json:"uid"`
-	Role     string `json:"role"`
-	Username string `json:"username"`
-	Token    string `json:"token"`
+	UserID string `json:"uid"`
 }
 
 // NewUserService creates a new instance of UserService
@@ -99,21 +97,30 @@ func (s *UserService) CreateUserAccount(user *model.UserAuth) (int, error) {
 }
 
 // SignIn is a method to handle user sign-in using the provided credentials
-func (s *UserService) SignIn(user *model.SignInModel) (*MyCustomClaims, error) {
+func (s *UserService) SignIn(user *model.SignInModel) (*response.SigninResponse, error) {
 	// Return a token or session information and any error encountered
 	authenticatedUser := &response.UserAuths{}
 
 	s.db.Model(&response.UserAuths{}).Preload("Roles").Where("username = ?", user.Username).Where("password = ?", user.Password).First(authenticatedUser)
+	fmt.Printf("%v", authenticatedUser)
 	tokenClaims, err := CreateJWT(fmt.Sprintf("%d", authenticatedUser.ID), authenticatedUser.Roles.RoleName, authenticatedUser.Username)
 	if err != nil {
 		return nil, err
 	}
-
-	return tokenClaims, nil
+	roleName := authenticatedUser.Roles.RoleName
+	userID := authenticatedUser.ID
+	userName := authenticatedUser.Username
+	signinResponse := response.SigninResponse{
+		Token:    tokenClaims,
+		Username: userName,
+		ID:       int(userID),
+		Role:     roleName,
+	}
+	return &signinResponse, nil
 }
 
 // CrateJWT creates a JWT token for the authenticated user
-func CreateJWT(userID, role, username string) (*MyCustomClaims, error) {
+func CreateJWT(userID, role, username string) (string, error) {
 	ctx := context.Background()
 	signingKey := []byte("7b8ebceb27141aacfbc79027")
 	manager, err := jwtutil.NewJWTManager(jwtutil.HS256, signingKey)
@@ -127,23 +134,22 @@ func CreateJWT(userID, role, username string) (*MyCustomClaims, error) {
 			Issuer:    "smartdeals.rw",
 			Subject:   "smartdeals-token-creator",
 		},
-		UserID:   userID,
-		Role:     role,
-		Username: username,
+		UserID: userID,
 	}
 
 	tokenStringHS256, err := manager.CreateToken(ctx, claims)
 
 	if err != nil {
-		log.Fatalf("Failed to create token: %v", err)
+		//log.Fatalf("Failed to create token: %v", err)
+		return "Failure", nil
 	}
 
 	parsedClaims := &MyCustomClaims{}
 	err = manager.ParseAndValidateToken(ctx, tokenStringHS256, parsedClaims)
 	if err != nil {
-		log.Fatalf("Failed to validate token: %v", err)
+		//log.Fatalf("Failed to validate token: %v", err)
+		return "Failure", nil
 	}
-	parsedClaims.Token = tokenStringHS256
 
-	return parsedClaims, nil
+	return tokenStringHS256, nil
 }

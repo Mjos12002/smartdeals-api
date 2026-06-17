@@ -9,4 +9,4 @@ CREATE TABLE product_categories (
 );
 
 -- +goose Down
-DROP TABLE product_category;
+DROP TABLE product_categories;
