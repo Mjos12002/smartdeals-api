@@ -23,7 +23,8 @@ type UserService struct {
 // MyCustomClaims is the structure of the jwt claims
 type MyCustomClaims struct {
 	jwt.RegisteredClaims
-	UserID string `json:"uid"`
+	UserID   string `json:"uid"`
+	UserRole string `json:"user_role"`
 }
 
 // NewUserService creates a new instance of UserService
@@ -134,7 +135,8 @@ func CreateJWT(userID, role, username string) (string, error) {
 			Issuer:    "smartdeals.rw",
 			Subject:   "smartdeals-token-creator",
 		},
-		UserID: userID,
+		UserID:   userID,
+		UserRole: role,
 	}
 
 	tokenStringHS256, err := manager.CreateToken(ctx, claims)

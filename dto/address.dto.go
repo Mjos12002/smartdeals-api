@@ -4,8 +4,12 @@ package dto
 type AddressDTO struct {
 	Street      string `json:"street" binding:"required,min=5,max=100"`
 	PopularName string `json:"popular_name" binding:"required,min=5,max=100"`
-	Province    string `json:"province" binding:"required,min=5,max=100"`
-	District    string `json:"district" binding:"required"`
-	Sector      string `json:"sector" binding:"required"`
-	LongLat     string `json:"longlat" binding:"required"`
+	Province    string `json:"province"`
+	District    string `json:"district"`
+	Sector      string `json:"sector"`
+	LongLat     string `json:"long_lat"`
+	Email       string `json:"email"`
+	PhoneNumber string `json:"phone_number"`
+	Twitter     string `json:"twitter"`
+	Facebook    string `json:"facebook"`
 }

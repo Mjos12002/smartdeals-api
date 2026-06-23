@@ -16,7 +16,7 @@ import (
 // CreateUser is a handler function to create a new user
 func CreateUser(c *gin.Context) {
 
-	var userProfile dto.UserProfileDTO
+	var userProfile dto.UserDTO
 
 	// Bind the JSON request body to the userDetails struct and handle any binding errors
 	if err := c.ShouldBindJSON(&userProfile); err != nil {
@@ -35,10 +35,9 @@ func CreateUser(c *gin.Context) {
 	userService := service.NewUserService(utils.DBInitialize())
 
 	userProfileModel := model.UserProfiles{
-		FirstName: userProfile.FirstName,
-		LastName:  userProfile.LastName,
-		Email:     userProfile.Email,
-		Phone:     userProfile.Phone,
+		FirstName:   userProfile.Username,
+		LastName:    userProfile.Password,
+		UserAuthsId: 2,
 	}
 
 	userID, err := userService.CreateProfile(&userProfileModel)

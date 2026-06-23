@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	restcontroller "smartdeals.rw/controller"
 )
@@ -10,56 +9,79 @@ import (
 func main() {
 
 	//dbInit.Create(&role)
-	r := gin.Default()
-	r.Use(cors.Default())
+	router := gin.Default()
+	router.Use(CORSMiddleware())
 
-	//Route to get the user by ID
-	r.GET("/api/v1/user/:id", restcontroller.GetUser) // Get a user
+	secure := router.Group("/api/secure")
+	{
+		//Route to get the user by ID
+		secure.GET("/v1/user/:id", restcontroller.GetUser) // Get a user
 
-	//Get all roles
-	r.GET("/api/v1/role", restcontroller.GetAllRoles) // Get all roles
+		//Get all roles
+		secure.GET("/v1/role", restcontroller.GetAllRoles) // Get all roles
 
-	// Route to get a role by ID
-	r.GET("/api/v1/role/:id", restcontroller.GetRole) // Get a role
+		// Route to get a role by ID
+		secure.GET("/v1/role/:id", restcontroller.GetRole) // Get a role
 
-	// Route to create a new role
-	r.POST("/api/v1/role", restcontroller.CreateRole)
+		// Route to create a new role
+		secure.POST("/v1/role", restcontroller.CreateRole) // Create role
 
-	r.POST("/api/v1/user", restcontroller.CreateUser) // Create a new user
+		secure.POST("/v1/user", restcontroller.CreateUser) // Create a new user
 
-	// Route to get all users
-	r.GET("/api/v1/user", restcontroller.GetAllUsers) // Get all users
+		// Route to get all users
+		secure.GET("/v1/user", restcontroller.GetAllUsers) // Get all users
+		// Route to handle user sign-up
+		secure.POST("/v1/signup", restcontroller.SignUp) // User sign-up
 
-	// Route to handle user sign-up
-	r.POST("/api/v1/signup", restcontroller.SignUp) // User sign-up
+		// Route to handle user signin
+		secure.POST("/v1/signin", restcontroller.SignIn) // User sign-in
 
-	// Route to handle user signin
-	r.POST("/api/v1/signin", restcontroller.SignIn) // User sign-in
+		// Route to create a new address
+		secure.POST("/v1/address", restcontroller.CreateAddress) // Create a new address
 
-	// Route to create a new address
-	r.POST("/api/v1/address", restcontroller.CreateAddress) // Create a new address
+		// Route to get all addresses
+		secure.GET("/v1/address", restcontroller.GetAllAddresses) // Get all addresses
 
-	// Route to get all addresses
-	r.GET("/api/v1/address", restcontroller.GetAllAddresses) // Get all addresses
+		// Route to create a new business
+		secure.POST("/v1/business", restcontroller.CreateBusiness) // Create a new business
 
-	// Route to create a new business
-	r.POST("/api/v1/business", restcontroller.CreateBusiness) // Create a new business
+		// Route to get all businesses
+		secure.GET("/v1/business", restcontroller.GetAllBusinesses) // Get all businesses
 
-	// Route to get all businesses
-	r.GET("/api/v1/business", restcontroller.GetAllBusinesses) // Get all businesses
+		// Route to create a new product
+		secure.POST("/v1/product", restcontroller.CreateProduct) // Create a new product
 
-	// Route to create a new product
-	r.POST("/api/v1/product", restcontroller.CreateProduct) // Create a new product
+		// Route to get all products
+		secure.GET("/v1/product", restcontroller.GetAllProducts) // Get all products``
 
-	// Route to get all products
-	r.GET("/api/v1/product", restcontroller.GetAllProducts) // Get all products``
+		// Route to create a new product category
+		secure.POST("/v1/product-category", restcontroller.CreateProductCategory) // Create product category
 
-	// Route to create a new product category
-	r.POST("/api/v1/product-category", restcontroller.CreateProductCategory)
+		// Route to get all product categories
+		secure.GET("/v1/product-category", restcontroller.GetAllProductCategories) // Get all product categoris
 
-	// Route to get all product categories
-	r.GET("/api/v1/product-category", restcontroller.GetAllProductCategories)
+		// Route to create profile
+		secure.POST("/v1/profile", restcontroller.CreateProfile) // Create profile
 
+	}
 	// Start the server on a specific port
-	r.Run(":8090") // Run on port 8090
+	router.Run(":8090") // Run on port 8090
+}
+
+// CORSMiddleware is used to allow CORS
+func CORSMiddleware() gin.HandlerFunc {
+	return func(context *gin.Context) {
+
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Credentials", "true")
+		context.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		context.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+
+		if context.Request.Method == "OPTIONS" {
+			context.AbortWithStatus(204)
+			return
+		}
+
+		context.Next()
+	}
 }
