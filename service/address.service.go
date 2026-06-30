@@ -1,6 +1,8 @@
 package service
 
 import (
+	"net/http"
+
 	"gorm.io/gorm"
 	"smartdeals.rw/model"
 	"smartdeals.rw/response"
@@ -34,7 +36,7 @@ func (s *AddressService) GetAllAddresses() (response.AddressResponse, error) {
 	// Return the list of addresses and any error encountered
 
 	status := "success"
-	code := 200
+	code := http.StatusOK
 	message := "Addresses retrieved successfully"
 	errMsg := ""
 
@@ -42,8 +44,8 @@ func (s *AddressService) GetAllAddresses() (response.AddressResponse, error) {
 	result := s.db.Find(&addresses)
 	if result.Error != nil {
 		status = "error"
-		code = 500
-		message = "Failed to retrieve addresses"
+		code = http.StatusInternalServerError
+		message = result.Error.Error()
 		errMsg = result.Error.Error()
 	}
 

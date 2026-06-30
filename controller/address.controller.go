@@ -3,6 +3,8 @@ package controller
 // This file contains the controller functions for handling address-related API requests.
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"smartdeals.rw/dto"
@@ -81,12 +83,11 @@ func GetAllAddresses(c *gin.Context) {
 	tokenStatus := utils.ProcessToken(token)
 
 	status := tokenStatus.Status
-
 	if status == "Invalid token" {
 
-		c.JSON(404, response.GenericCreateResponse{
+		c.JSON(http.StatusUnauthorized, response.GenericCreateResponse{
 			Status:   "error",
-			Code:     404,
+			Code:     http.StatusUnauthorized,
 			Message:  status,
 			RecordID: 0,
 			Err:      jwt.ErrECDSAVerification.Error(),
@@ -97,9 +98,9 @@ func GetAllAddresses(c *gin.Context) {
 	addressResponse, err := addressService.GetAllAddresses()
 
 	if err != nil {
-		c.JSON(500, response.GenericCreateResponse{
+		c.JSON(http.StatusInternalServerError, response.GenericCreateResponse{
 			Status:   "error",
-			Code:     500,
+			Code:     http.StatusInternalServerError,
 			Message:  "Failed to retrieve addresses",
 			Err:      err.Error(),
 			RecordID: 0,

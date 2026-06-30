@@ -103,7 +103,6 @@ func (s *UserService) SignIn(user *model.SignInModel) (*response.SigninResponse,
 	authenticatedUser := &response.UserAuths{}
 
 	s.db.Model(&response.UserAuths{}).Preload("Roles").Where("username = ?", user.Username).Where("password = ?", user.Password).First(authenticatedUser)
-	fmt.Printf("%v", authenticatedUser)
 	tokenClaims, err := CreateJWT(fmt.Sprintf("%d", authenticatedUser.ID), authenticatedUser.Roles.RoleName, authenticatedUser.Username)
 	if err != nil {
 		return nil, err

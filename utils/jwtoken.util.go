@@ -45,7 +45,6 @@ func ProcessToken(token string) TokenResponse {
 		if err != nil {
 			//log.Fatalf("Failed to validate token: %v", err)
 			tokenStatus = "Invalid token"
-			fmt.Print("Invalid token\n")
 		}
 		fmt.Printf("%s will expire\n", parsedClaims.ExpiresAt)
 		return TokenResponse{

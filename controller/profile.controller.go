@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +11,54 @@ import (
 	"smartdeals.rw/service"
 	"smartdeals.rw/utils"
 )
+
+// Get profile
+func GetProfile(context *gin.Context) {
+
+	// Check the Authorization header
+	var token = context.GetHeader("Authorization")
+	// Initialize the profile
+	if token == "" {
+		context.AbortWithStatusPureJSON(http.StatusUnauthorized, response.ProfileResponse{
+			Status:  "Error",
+			Code:    http.StatusUnauthorized,
+			Message: "Unauthorized",
+		})
+		return
+	}
+
+	userToken := utils.ProcessToken(token)
+	userID := 0
+	// Process invalid token
+	if userToken.Status == "Invalid token" {
+		context.JSON(http.StatusUnauthorized, response.ProfileResponse{
+			Status:  "Error",
+			Code:    http.StatusUnauthorized,
+			Message: "Unauthorized user, contact admin",
+		})
+		return
+	}
+
+	// Process valid token
+	userID, err := strconv.Atoi(userToken.Id)
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, response.ProfileResponse{
+			Status:  "Error",
+			Code:    http.StatusUnauthorized,
+			Message: "Invalid user ID",
+		})
+		return
+	}
+
+	profileService := service.NewProfileService(utils.DBInitialize())
+	pr, err := profileService.GetProfile(userID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, pr)
+		return
+	}
+	context.JSON(200, pr)
+
+}
 
 // Create profile
 func CreateProfile(c *gin.Context) {
@@ -31,12 +79,10 @@ func CreateProfile(c *gin.Context) {
 	}
 
 	// Get the user id
-	fmt.Printf("token: %s\n", token)
 	userToken := utils.ProcessToken(token)
 
 	// Initialize the profile service
 	profileService := service.NewProfileService(utils.DBInitialize())
-	fmt.Printf("User ID: %d", userToken.Id)
 	if userToken.Status != "Invalid token" {
 		userID, err := strconv.Atoi(userToken.Id)
 		if err != nil {

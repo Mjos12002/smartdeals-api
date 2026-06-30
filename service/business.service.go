@@ -1,6 +1,8 @@
 package service
 
 import (
+	"net/http"
+
 	"gorm.io/gorm"
 	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
@@ -21,19 +23,17 @@ func NewBusinessService(db *gorm.DB) *BusinessService {
 
 // CreateBusiness creates a new business in the database
 func (s *BusinessService) CreateBusiness(business *dto.BusinessesDTO) (int, error) {
-	// Implement logic to create a new business in the database using the provided business details
-	// Return the created business and any error encountered
 	// validate the business data before creating it in the database
 	err := utils.ValidateBusiness(*business)
 	if err != nil {
 		return 0, err
 	}
 	businessModel := model.Businesses{
-		Name:          business.Name,
-		Description:   business.Description,
-		LogoURL:       business.LogoURL,
-		AddressID:     business.Address,
-		UserDetailsID: business.UserDetails,
+		Name:           business.Name,
+		Description:    business.Description,
+		LogoURL:        business.LogoURL,
+		AddressesID:    business.Address,
+		UserProfilesID: business.UserProfile,
 	}
 	result := s.db.Create(&businessModel)
 	if result.Error != nil {
@@ -43,7 +43,7 @@ func (s *BusinessService) CreateBusiness(business *dto.BusinessesDTO) (int, erro
 }
 
 // GetAllBusinesses retrieves all businesses from the database
-func (s *BusinessService) GetAllBusinesses() response.BusinessResponse {
+func (s *BusinessService) GetAllBusinesses(profileID int) response.BusinessResponse {
 	// Implement logic to fetch all businesses from the database
 	// Return the list of businesses and any error encountered
 
@@ -53,10 +53,10 @@ func (s *BusinessService) GetAllBusinesses() response.BusinessResponse {
 	errMsg := ""
 
 	var businesses []model.Businesses
-	result := s.db.Find(&businesses)
+	result := s.db.Where("user_profiles_id = ?", profileID).Find(&businesses)
 	if result.Error != nil {
 		status = "error"
-		code = 500
+		code = http.StatusInternalServerError
 		message = "Failed to retrieve businesses"
 		errMsg = result.Error.Error()
 	}

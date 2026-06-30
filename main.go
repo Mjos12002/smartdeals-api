@@ -63,6 +63,8 @@ func main() {
 		// Route to create profile
 		secure.POST("/v1/profile", restcontroller.CreateProfile) // Create profile
 
+		secure.GET("/v1/profile", restcontroller.GetProfile)
+
 	}
 	// Start the server on a specific port
 	router.Run(":8090") // Run on port 8090
@@ -81,6 +83,14 @@ func CORSMiddleware() gin.HandlerFunc {
 			context.AbortWithStatus(204)
 			return
 		}
+
+		context.Next()
+	}
+}
+
+// SecureAPIMiddleWare is a middleware used to secure APIs by requiring the Authentication token
+func SecureAPIMiddleWare() gin.HandlerFunc {
+	return func(context *gin.Context) {
 
 		context.Next()
 	}

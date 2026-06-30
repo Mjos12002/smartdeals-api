@@ -4,6 +4,7 @@ package service
 
 import (
 	"gorm.io/gorm"
+	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
 )
 
@@ -18,13 +19,28 @@ func NewProductService(db *gorm.DB) *ProductService {
 }
 
 // CreateProduct creates a new product in the database & return the created record id and any error encountered
-func (s *ProductService) CreateProduct(product *model.Products) (int, error) {
+func (s *ProductService) CreateProduct(productDTO *dto.ProductDTO) (int, error) {
+
 	// Return the created product and any error encountered
-	productCreated := s.db.Create(&product)
+	productModel := model.Products{
+		Name:                productDTO.Name,
+		Description:         productDTO.Description,
+		Price:               float64(productDTO.Price),
+		Discount:            float64(productDTO.Discount),
+		DiscountedPrice:     float64(productDTO.DiscountedPrice),
+		DiscountStartDate:   productDTO.DiscountStartDate,
+		DiscountEndDate:     productDTO.DiscountEndDate,
+		Status:              productDTO.Status,
+		Logo:                productDTO.Logo,
+		ProductCategoriesID: 1,
+		BusinessesID:        1,
+	}
+
+	productCreated := s.db.Create(&productModel)
 	if productCreated.Error != nil {
 		return 0, productCreated.Error
 	}
-	return int(product.ID), nil
+	return int(productModel.ID), nil
 
 }
 
