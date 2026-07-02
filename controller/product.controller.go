@@ -80,7 +80,7 @@ func CreateProduct(context *gin.Context) {
 		})
 		return
 	}
-	fileHandleError := utils.HandleFileUpload(logoFile, logoFileHeader, context)
+	logoPath, fileHandleError := utils.HandleFileUpload(logoFile, logoFileHeader, context)
 	if fileHandleError != nil {
 		context.JSON(http.StatusBadRequest, response.GenericCreateResponse{
 			Status:   "error",
@@ -101,7 +101,7 @@ func CreateProduct(context *gin.Context) {
 	productDTO.DiscountStartDate = discountStartDate
 	productDTO.DiscountEndDate = discountEndDate
 	productDTO.Status = status
-	productDTO.Logo = logoFileHeader.Filename
+	productDTO.Logo = logoPath
 	// Call the service layer to create the product
 	productService := service.NewProductService(utils.DBInitialize())
 	createdProductID, err := productService.CreateProduct(&productDTO)

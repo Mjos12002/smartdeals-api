@@ -9,7 +9,7 @@ import (
 )
 
 // A utility to handle file uploads
-func HandleFileUpload(logoFile multipart.File, logoFileHeader *multipart.FileHeader, context *gin.Context) error {
+func HandleFileUpload(logoFile multipart.File, logoFileHeader *multipart.FileHeader, context *gin.Context) (string, error) {
 
 	defer logoFile.Close()
 
@@ -20,8 +20,8 @@ func HandleFileUpload(logoFile multipart.File, logoFileHeader *multipart.FileHea
 	logoFileDest := filepath.Join("./resources/products/", newFilename)
 
 	if err := context.SaveUploadedFile(logoFileHeader, logoFileDest); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return logoFileDest, nil
 }

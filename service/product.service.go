@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
+	"smartdeals.rw/response"
 )
 
 // ProductService provides methods for product-related operations
@@ -54,11 +55,27 @@ func (s *ProductService) GetProduct(id string) (*model.Products, error) {
 	return &product, nil
 }
 
-// Get all products
-func (s *ProductService) GetAllProducts() ([]model.Products, error) {
+// Get all products and convert to the response.ProductResponseData format
+func (s *ProductService) GetAllProducts() ([]response.ProductResponseData, error) {
 	var products []model.Products
 	if err := s.db.Find(&products).Error; err != nil {
 		return nil, err
 	}
-	return products, nil
+	productResponses := make([]response.ProductResponseData, len(products))
+	for i, product := range products {
+		productResponses[i] = response.ProductResponseData{
+			Name:                product.Name,
+			Description:         product.Description,
+			Price:               product.Price,
+			Discount:            product.Discount,
+			DiscountedPrice:     product.DiscountedPrice,
+			DiscountStartDate:   product.DiscountStartDate,
+			DiscountEndDate:     product.DiscountEndDate,
+			Status:              product.Status,
+			ProductCategoriesID: product.ProductCategoriesID,
+			Logo:                product.Logo,
+			BusinessesID:        product.BusinessesID,
+		}
+	}
+	return productResponses, nil
 }
