@@ -140,6 +140,8 @@ func GetAllProducts(c *gin.Context) {
 		return
 	}
 
+	
+
 	c.JSON(http.StatusOK, response.ProductResponse{
 		Status:  "success",
 		Code:    http.StatusOK,

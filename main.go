@@ -66,6 +66,7 @@ func main() {
 		secure.GET("/v1/profile", restcontroller.GetProfile)
 
 	}
+	//Serving static files from the resources directory
 	router.Static("/resources", "./resources/")
 	// Start the server on a specific port
 	router.Run(":8090") // Run on port 8090
