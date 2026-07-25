@@ -1,27 +1,40 @@
 package utils
 
 import (
-	"mime/multipart"
+	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 // A utility to handle file uploads
-func HandleFileUpload(logoFile multipart.File, logoFileHeader *multipart.FileHeader, context *gin.Context) (string, error) {
+func HandleFileUpload(context *gin.Context, destination string) (string, error) {
 
-	defer logoFile.Close()
+	// Declare the multiform
+	multiPForm, error := context.MultipartForm()
 
-	logoFileExt := filepath.Ext(logoFileHeader.Filename)
-
-	newFilename := uuid.New().String() + logoFileExt
-
-	logoFileDest := filepath.Join("./resources/products/", newFilename)
-
-	if err := context.SaveUploadedFile(logoFileHeader, logoFileDest); err != nil {
-		return "", err
+	if error != nil {
+		return error.Error(), error
 	}
 
-	return logoFileDest, nil
+	// Get the files uploaded
+	files := multiPForm.File["logo_url"]
+	fileURL := []string{}
+
+	for _, file := range files {
+
+		logoFileExt := filepath.Ext(file.Filename)
+		newFilename := uuid.New().String() + logoFileExt
+
+		logoFileDest := filepath.Join(fmt.Sprintf("./resources/%s", destination), newFilename)
+		fmt.Printf("Destination - %s\n", logoFileDest)
+		if err := context.SaveUploadedFile(file, logoFileDest); err != nil {
+			return err.Error(), err
+		}
+		fileURL = append(fileURL, logoFileDest)
+
+	}
+	return strings.Join(fileURL, ", "), nil
 }

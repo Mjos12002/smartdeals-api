@@ -32,7 +32,15 @@ func (s *BusinessService) CreateBusiness(business *dto.BusinessesDTO) (int, erro
 		Name:           business.Name,
 		Description:    business.Description,
 		LogoURL:        business.LogoURL,
-		AddressesID:    business.Address,
+		Street:         business.Street,
+		PopularName:    business.PopularName,
+		Email:          business.Email,
+		PhoneNumber:    business.PhoneNumber,
+		Twitter:        business.Twitter,
+		Facebook:       business.Facebook,
+		Instagram:      business.Instagram,
+		Province:       business.Province,
+		District:       business.District,
 		UserProfilesID: business.UserProfile,
 	}
 	result := s.db.Create(&businessModel)
@@ -68,4 +76,26 @@ func (s *BusinessService) GetAllBusinesses(profileID int) response.BusinessRespo
 		Err:     errMsg,
 		Data:    businesses,
 	} // Placeholder return value
+}
+
+// GetUserBusiness is used to load business of users
+func (s *BusinessService) GetUserBusiness(userID int) response.BusinessResponse {
+	var businesses []model.Businesses
+	result := s.db.Joins("JOIN user_profiles ON user_profiles.id = businesses.user_profiles_id").Joins("JOIN user_auths ON user_auths.id = user_profiles.user_auths_id AND user_auths.id = ?", userID).Find(&businesses)
+	if result.Error != nil {
+		return response.BusinessResponse{
+			Status:  "Error",
+			Code:    http.StatusInternalServerError,
+			Message: result.Error.Error(),
+			Err:     result.Error.Error(),
+			Data:    businesses,
+		}
+	}
+	return response.BusinessResponse{
+		Status:  "Success",
+		Code:    http.StatusAccepted,
+		Message: "Successfully returned data",
+		Err:     "",
+		Data:    businesses,
+	}
 }

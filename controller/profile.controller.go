@@ -68,10 +68,10 @@ func CreateProfile(c *gin.Context) {
 	// Initialize the profile
 	var profileDTO dto.ProfileDTO
 	if err := c.ShouldBindJSON(&profileDTO); err != nil {
-		c.JSON(422, response.GenericCreateResponse{
-			Status:   "error",
-			Code:     422,
-			Message:  "Invalid request body",
+		c.JSON(http.StatusUnprocessableEntity, response.GenericCreateResponse{
+			Status:   "Error",
+			Code:     http.StatusUnprocessableEntity,
+			Message:  "Unprocessable entity",
 			Err:      err.Error(),
 			RecordID: 0,
 		})
@@ -86,9 +86,9 @@ func CreateProfile(c *gin.Context) {
 	if userToken.Status != "Invalid token" {
 		userID, err := strconv.Atoi(userToken.Id)
 		if err != nil {
-			c.JSON(500, response.GenericCreateResponse{
+			c.JSON(http.StatusInternalServerError, response.GenericCreateResponse{
 				Status:   "error",
-				Code:     500,
+				Code:     http.StatusInternalServerError,
 				Message:  "Unknown account user",
 				Err:      err.Error(),
 				RecordID: 0,
@@ -98,31 +98,34 @@ func CreateProfile(c *gin.Context) {
 		profileModel := model.UserProfiles{
 			FirstName:   profileDTO.FirstName,
 			LastName:    profileDTO.LastName,
+			PhoneNumber: profileDTO.PhoneNumber,
+			Email:       profileDTO.Email,
 			UserAuthsId: userID,
 		}
 		id, err := profileService.CreateProfile(&profileModel)
 		if err != nil {
-			c.JSON(500, response.GenericCreateResponse{
-				Status:   "error",
-				Code:     500,
+			c.JSON(http.StatusInternalServerError, response.GenericCreateResponse{
+				Status:   "Error",
+				Code:     http.StatusInternalServerError,
 				Message:  "Error creating profile",
 				Err:      err.Error(),
 				RecordID: 0,
 			})
 			return
 		}
-		c.JSON(200, response.GenericCreateResponse{
-			Status:   "error",
-			Code:     200,
+		c.JSON(http.StatusCreated, response.GenericCreateResponse{
+			Status:   "Success",
+			Code:     http.StatusCreated,
 			Message:  "Profile created successfully",
 			RecordID: id,
 		})
 		return
 	}
-	c.JSON(500, response.GenericCreateResponse{
-		Status:   "error",
-		Code:     500,
-		Message:  "Invalid token",
+	// Return invalid token
+	c.JSON(http.StatusInternalServerError, response.GenericCreateResponse{
+		Status:   "Error",
+		Code:     http.StatusInternalServerError,
+		Message:  userToken.Status,
 		RecordID: 0,
 	})
 

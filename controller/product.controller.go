@@ -3,9 +3,7 @@ package controller
 // This file contains the controller functions for handling Product-related HTTP requests.
 
 import (
-	"mime/multipart"
 	"net/http"
-	"path/filepath"
 	"strconv"
 
 	"smartdeals.rw/dto"
@@ -14,17 +12,32 @@ import (
 	"smartdeals.rw/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // CreateProduct handles the creation of a new product
 func CreateProduct(context *gin.Context) {
+
+	// Get user id from the token
+	token := context.GetHeader("Authorization")
+	processedToken := utils.ProcessToken(token)
+
+	if processedToken.Status == "Invalid token" {
+		context.JSON(http.StatusBadRequest, response.GenericCreateResponse{
+			Status:   "Error",
+			Code:     http.StatusUnauthorized,
+			Message:  "Unauthorized, contact admin",
+			Err:      "Unauthorized, contact admin",
+			RecordID: 0,
+		})
+		return
+	}
+
+	userID, _ := strconv.Atoi(processedToken.Id)
+	// End getting user id from the token
 	var productDTO dto.ProductDTO
 
 	name := context.Request.FormValue("name")
 	description := context.Request.FormValue("description")
-
-	logoFile, logoFileHeader, fileError := context.Request.FormFile("logo")
 
 	price, err := strconv.Atoi(context.Request.FormValue("price"))
 	// Check the conversion of the price to integer type
@@ -33,6 +46,18 @@ func CreateProduct(context *gin.Context) {
 			Status:   "error",
 			Code:     http.StatusBadRequest,
 			Message:  "Invalid price value",
+			Err:      err.Error(),
+			RecordID: 0,
+		})
+		return
+	}
+
+	product_categories_id, err := strconv.Atoi(context.Request.FormValue("product_categories_id"))
+	if err != nil {
+		context.JSON(http.StatusBadRequest, response.GenericCreateResponse{
+			Status:   "error",
+			Code:     http.StatusBadRequest,
+			Message:  "Invalid product category",
 			Err:      err.Error(),
 			RecordID: 0,
 		})
@@ -64,23 +89,10 @@ func CreateProduct(context *gin.Context) {
 		})
 		return
 	}
-
-	discountStartDate := context.Request.FormValue("discount_start_date")
-	discountEndDate := context.Request.FormValue("discount_end_date")
 	status := context.Request.FormValue("status")
 
 	//Check the uploaded logo file details
-	if fileError != nil {
-		context.JSON(http.StatusBadRequest, response.GenericCreateResponse{
-			Status:   "error",
-			Code:     http.StatusBadRequest,
-			Message:  "Invalid file",
-			Err:      fileError.Error(),
-			RecordID: 0,
-		})
-		return
-	}
-	logoPath, fileHandleError := utils.HandleFileUpload(logoFile, logoFileHeader, context)
+	logoPath, fileHandleError := utils.HandleFileUpload(context, "products")
 	if fileHandleError != nil {
 		context.JSON(http.StatusBadRequest, response.GenericCreateResponse{
 			Status:   "error",
@@ -98,18 +110,22 @@ func CreateProduct(context *gin.Context) {
 	productDTO.Price = price
 	productDTO.Discount = discount
 	productDTO.DiscountedPrice = discountedPrice
-	productDTO.DiscountStartDate = discountStartDate
-	productDTO.DiscountEndDate = discountEndDate
 	productDTO.Status = status
 	productDTO.Logo = logoPath
+	productDTO.ProductCategory = product_categories_id
+
 	// Call the service layer to create the product
 	productService := service.NewProductService(utils.DBInitialize())
+	businessService := service.NewBusinessService(utils.DBInitialize())
+	businessDetails := businessService.GetUserBusiness(userID)
+	productDTO.BusinessID = int(businessDetails.Data[0].ID)
+
 	createdProductID, err := productService.CreateProduct(&productDTO)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, response.GenericCreateResponse{
 			Status:   "error",
 			Code:     http.StatusInternalServerError,
-			Message:  "Failed to create product",
+			Message:  err.Error(),
 			Err:      err.Error(),
 			RecordID: 0,
 		})
@@ -139,30 +155,11 @@ func GetAllProducts(c *gin.Context) {
 		})
 		return
 	}
-
-	
-
+	// Run this when the operation (select records) is done successfully
 	c.JSON(http.StatusOK, response.ProductResponse{
 		Status:  "success",
 		Code:    http.StatusOK,
 		Message: "Products retrieved successfully",
 		Data:    products,
 	})
-}
-
-func HandleFileUploading(logoFile multipart.File, logoFileHeader *multipart.FileHeader, context *gin.Context) error {
-
-	defer logoFile.Close()
-
-	logoFileExt := filepath.Ext(logoFileHeader.Filename)
-
-	newFilename := uuid.New().String() + logoFileExt
-
-	logoFileDest := filepath.Join("./resources", newFilename)
-
-	if err := context.SaveUploadedFile(logoFileHeader, logoFileDest); err != nil {
-		return err
-	}
-
-	return nil
 }

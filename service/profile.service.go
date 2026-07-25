@@ -28,6 +28,7 @@ func (s *ProfileService) CreateProfile(profile *model.UserProfiles) (int, error)
 	return int(profile.ID), nil
 }
 
+// GetProfileID is used used to get the profile details based on the user id
 func (s *ProfileService) GetProfileID(userID int) (*response.ProfileResponse, error) {
 	var userProfile *model.UserProfiles
 	if err := s.db.Where("user_auths_id = ?", userID).First(&userProfile).Error; err != nil {

@@ -3,6 +3,8 @@ package service
 // This file contains the service layer for handling business logic related to products.
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 	"smartdeals.rw/dto"
 	"smartdeals.rw/model"
@@ -29,12 +31,10 @@ func (s *ProductService) CreateProduct(productDTO *dto.ProductDTO) (int, error) 
 		Price:               float64(productDTO.Price),
 		Discount:            float64(productDTO.Discount),
 		DiscountedPrice:     float64(productDTO.DiscountedPrice),
-		DiscountStartDate:   productDTO.DiscountStartDate,
-		DiscountEndDate:     productDTO.DiscountEndDate,
 		Status:              productDTO.Status,
 		Logo:                productDTO.Logo,
-		ProductCategoriesID: 1,
-		BusinessesID:        1,
+		ProductCategoriesID: productDTO.ProductCategory,
+		BusinessesID:        productDTO.BusinessID,
 	}
 
 	productCreated := s.db.Create(&productModel)
@@ -57,10 +57,13 @@ func (s *ProductService) GetProduct(id string) (*model.Products, error) {
 
 // Get all products and convert to the response.ProductResponseData format
 func (s *ProductService) GetAllProducts() ([]response.ProductResponseData, error) {
-	var products []model.Products
-	if err := s.db.Find(&products).Error; err != nil {
+
+	var products []response.Products
+	if err := s.db.Model(&response.Products{}).Preload("Businesses").Preload("Categories").Find(&products).Error; err != nil {
+		fmt.Printf("Error %s", err.Error())
 		return nil, err
 	}
+
 	productResponses := make([]response.ProductResponseData, len(products))
 	for i, product := range products {
 		productResponses[i] = response.ProductResponseData{
@@ -69,12 +72,11 @@ func (s *ProductService) GetAllProducts() ([]response.ProductResponseData, error
 			Price:               product.Price,
 			Discount:            product.Discount,
 			DiscountedPrice:     product.DiscountedPrice,
-			DiscountStartDate:   product.DiscountStartDate,
-			DiscountEndDate:     product.DiscountEndDate,
 			Status:              product.Status,
 			ProductCategoriesID: product.ProductCategoriesID,
 			Logo:                product.Logo,
-			BusinessesID:        product.BusinessesID,
+			Business:            product.Businesses,
+			Cateegories:         product.Categories,
 		}
 	}
 	return productResponses, nil

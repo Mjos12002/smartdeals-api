@@ -1,10 +1,11 @@
 package controller
 
 // This file contains the controller functions for handling business-related API requests.
-
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"path/filepath"
 
@@ -22,8 +23,9 @@ func CreateBusiness(context *gin.Context) {
 	// Process the authorization jwt token
 	token := context.GetHeader("Authorization")
 	processedToken := utils.ProcessToken(token)
+	fmt.Printf("%s", processedToken)
 
-	if processedToken.Id == "" {
+	if processedToken.Status == "Invalid token" {
 		context.JSON(http.StatusBadRequest, response.GenericCreateResponse{
 			Status:   "Error",
 			Code:     http.StatusUnauthorized,
@@ -39,7 +41,20 @@ func CreateBusiness(context *gin.Context) {
 	var business dto.BusinessesDTO
 	name := context.Request.FormValue("name")
 	description := context.Request.FormValue("description")
-	logoFile, logoFileHeader, err := context.Request.FormFile("logo_url")
+	street := context.Request.FormValue("street")
+	popular_name := context.Request.FormValue("popular_name")
+	email := context.Request.FormValue("email")
+	phone_number := context.Request.FormValue("phone_number")
+	twitter := context.Request.FormValue("twitter")
+	facebook := context.Request.FormValue("facebook")
+	instagram := context.Request.FormValue("instagram")
+	province := context.Request.FormValue("province")
+	district := context.Request.FormValue("district")
+	fileURL := []string{}
+
+	//logoFile, logoFileHeader, err := context.Request.FormFile("logo_url")
+
+	multiPForm, err := context.MultipartForm()
 
 	// Processing the logo file
 	if err != nil {
@@ -52,12 +67,29 @@ func CreateBusiness(context *gin.Context) {
 		})
 		return
 	}
-	defer logoFile.Close()
 
-	logoFileExt := filepath.Ext(logoFileHeader.Filename)
-	newFilename := uuid.New().String() + logoFileExt
+	// Get the files uploaded
+	files := multiPForm.File["logo_url"]
 
-	logoFileDest := filepath.Join("./resources", newFilename)
+	for _, file := range files {
+
+		logoFileExt := filepath.Ext(file.Filename)
+		newFilename := uuid.New().String() + logoFileExt
+
+		logoFileDest := filepath.Join("./resources", newFilename)
+		if err := context.SaveUploadedFile(file, logoFileDest); err != nil {
+			context.JSON(http.StatusInternalServerError, response.GenericCreateResponse{
+				Status:   "Error",
+				Code:     http.StatusInternalServerError,
+				Message:  err.Error(),
+				Err:      err.Error(),
+				RecordID: 0,
+			})
+			return
+		}
+		fileURL = append(fileURL, logoFileDest)
+
+	}
 
 	// Get user profile id
 	userAuthService := service.NewProfileService(utils.DBInitialize())
@@ -77,21 +109,19 @@ func CreateBusiness(context *gin.Context) {
 	}
 
 	business.Name = name
-	business.Address = 1
+	business.Street = street
 	business.Description = description
-	business.LogoURL = logoFileDest
+	business.LogoURL = strings.Join(fileURL, ", ")
+	business.PopularName = phone_number
+	business.Email = email
+	business.PhoneNumber = phone_number
+	business.Twitter = twitter
+	business.Facebook = facebook
+	business.Instagram = instagram
+	business.Province = province
+	business.District = district
 	business.UserProfile = profileID.Data.ID
-
-	if err := context.SaveUploadedFile(logoFileHeader, logoFileDest); err != nil {
-		context.JSON(http.StatusInternalServerError, response.GenericCreateResponse{
-			Status:   "Error",
-			Code:     http.StatusInternalServerError,
-			Message:  err.Error(),
-			Err:      err.Error(),
-			RecordID: 0,
-		})
-		return
-	}
+	business.PopularName = popular_name
 
 	// Create a new instance of BusinessService and call the CreateBusiness method to create the business
 	businessService := service.NewBusinessService(utils.DBInitialize())

@@ -8,6 +8,8 @@ type UserProfiles struct {
 	ID          int    `json:"id"`
 	FirstName   string `json:"first_name" binding:"required" validate:"required,min=5,max=30"`
 	LastName    string `json:"last_name" binding:"required" validate:"required,min=5,max=30"`
+	PhoneNumber string `json:"phone_number" binding:"required"`
+	Email       string `json:"email" binding:"required"`
 	UserAuthsId int    `json:"user_auths_id"`
 }
 
