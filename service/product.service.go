@@ -67,6 +67,35 @@ func (s *ProductService) GetAllProducts() ([]response.ProductResponseData, error
 	productResponses := make([]response.ProductResponseData, len(products))
 	for i, product := range products {
 		productResponses[i] = response.ProductResponseData{
+			ID:                  product.ID,
+			Name:                product.Name,
+			Description:         product.Description,
+			Price:               product.Price,
+			Discount:            product.Discount,
+			DiscountedPrice:     product.DiscountedPrice,
+			Status:              product.Status,
+			ProductCategoriesID: product.ProductCategoriesID,
+			Logo:                product.Logo,
+			Business:            product.Businesses,
+			Cateegories:         product.Categories,
+		}
+	}
+	return productResponses, nil
+}
+
+// Get all products and convert to the response.ProductResponseData format
+func (s *ProductService) GetAllProductByID(id int) ([]response.ProductResponseData, error) {
+
+	var products []response.Products
+	if err := s.db.Model(&response.Products{}).Preload("Businesses").Preload("Categories").Where("id", id).Find(&products).Error; err != nil {
+		fmt.Printf("Error %s", err.Error())
+		return nil, err
+	}
+
+	productResponses := make([]response.ProductResponseData, len(products))
+	for i, product := range products {
+		productResponses[i] = response.ProductResponseData{
+			ID:                  product.ID,
 			Name:                product.Name,
 			Description:         product.Description,
 			Price:               product.Price,

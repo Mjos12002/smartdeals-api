@@ -163,3 +163,27 @@ func GetAllProducts(c *gin.Context) {
 		Data:    products,
 	})
 }
+
+// GetAllProducts handles the retrieval of all products
+func GetAllProductByID(c *gin.Context) {
+	productID, _ := strconv.Atoi(c.Param("id"))
+	productService := service.NewProductService(utils.DBInitialize())
+	products, err := productService.GetAllProductByID(productID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.ProductResponse{
+			Status:  "error",
+			Code:    http.StatusInternalServerError,
+			Message: "Failed to retrieve products",
+			Err:     err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+	// Run this when the operation (select records) is done successfully
+	c.JSON(http.StatusOK, response.ProductResponse{
+		Status:  "success",
+		Code:    http.StatusOK,
+		Message: "Products retrieved successfully",
+		Data:    products,
+	})
+}

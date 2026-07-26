@@ -54,6 +54,9 @@ func main() {
 		// Route to get all products
 		secure.GET("/v1/product", restcontroller.GetAllProducts) // Get all products``
 
+		// Route to get all products
+		secure.GET("/v1/product/:id", restcontroller.GetAllProductByID) // Get all products``
+
 		// Route to create a new product category
 		secure.POST("/v1/product-category", restcontroller.CreateProductCategory) // Create product category
 

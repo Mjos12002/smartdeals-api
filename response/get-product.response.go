@@ -12,13 +12,12 @@ type ProductResponse struct {
 }
 
 type ProductResponseData struct {
+	ID                  uint              `json:"id"`
 	Name                string            `json:"name"`
 	Description         string            `json:"description"`
 	Price               float64           `json:"price"`
 	Discount            float64           `json:"discount"`
 	DiscountedPrice     float64           `json:"discounted_price"`
-	DiscountStartDate   string            `json:"discount_start_date"`
-	DiscountEndDate     string            `json:"discount_end_date"`
 	Status              string            `json:"status"`
 	ProductCategoriesID int               `json:"product_categories_id"`
 	Logo                string            `json:"logo"`
@@ -28,6 +27,7 @@ type ProductResponseData struct {
 
 type Products struct {
 	gorm.Model
+	ID                  uint              `json:"id"`
 	Name                string            `json:"name"`
 	Description         string            `json:"description"`
 	Price               float64           `json:"price"`
